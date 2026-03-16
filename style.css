@@ -800,8 +800,12 @@ tr.cat-header.cat-cleaning td {
         justify-content: center;
     }
 
-    /* Hide export/print buttons on mobile */
+    /* Show toolbar-right on mobile but hide export buttons */
     .toolbar-right {
+        justify-content: center;
+    }
+
+    .desktop-only {
         display: none !important;
     }
 
