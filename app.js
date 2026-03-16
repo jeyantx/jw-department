@@ -422,64 +422,148 @@ function clearSchedule() {
 }
 
 // ============================================================
-// IMAGE EXPORT
+// IMAGE EXPORT — builds a print-styled static clone, same as PDF
 // ============================================================
-async function captureTable() {
-    var w = document.querySelector('.table-wrapper');
-    // Temporarily remove overflow hidden so full table is visible
-    var origOverflow = w.style.overflow;
-    w.style.overflow = 'visible';
-    w.classList.add('export-mode');
+function buildPrintClone() {
+    // Category color map (matches CSS)
+    var catColors = {
+        sound:     { bg: '#eff6ff', color: '#1d4ed8', border: '#2563eb' },
+        attendant: { bg: '#fff7ed', color: '#c2410c', border: '#c2410c' },
+        cleaning:  { bg: '#ecfdf5', color: '#047857', border: '#059669' }
+    };
+    var colColors = {
+        midweek: { color: '#1e40af', border: '#2563eb' },
+        weekend: { color: '#92400e', border: '#d97706' }
+    };
 
-    // Replace select elements with plain text spans for clean image
-    var selects = w.querySelectorAll('select');
-    var selectData = [];
-    for (var i = 0; i < selects.length; i++) {
-        var sel = selects[i];
-        var span = document.createElement('span');
-        span.className = 'export-text';
-        span.textContent = (sel.value && sel.value !== '-') ? sel.value : '';
-        span.style.cssText = 'font-size:8.5pt;font-weight:600;color:#111827;white-space:nowrap;display:block;padding:0;';
-        sel.style.display = 'none';
-        sel.parentNode.insertBefore(span, sel.nextSibling);
-        selectData.push({ sel: sel, span: span });
+    // Gather current select values
+    var vals = {};
+    var sels = document.querySelectorAll('.schedule-table select');
+    for (var s = 0; s < sels.length; s++) {
+        vals[sels[s].id] = sels[s].value;
     }
 
-    // Hide remove buttons
-    var removeBtns = w.querySelectorAll('.btn-remove-col');
-    for (var r = 0; r < removeBtns.length; r++) removeBtns[r].style.display = 'none';
+    // Container — A4 landscape proportions (297mm ≈ 1122px at 96dpi, scaled up for crisp export)
+    var container = document.createElement('div');
+    container.style.cssText = 'position:absolute;left:-9999px;top:0;background:#fff;padding:20px 24px;font-family:"Noto Sans",sans-serif;width:1400px;';
+    document.body.appendChild(container);
 
-    // Add title inside wrapper for image capture
-    var titleDiv = document.createElement('div');
-    titleDiv.className = 'export-title';
-    titleDiv.style.cssText = 'font-size:16pt;font-weight:900;color:#111827;padding:16px 8px 12px;border-bottom:3px solid #111827;margin-bottom:0;font-family:Noto Sans,sans-serif;';
-    titleDiv.textContent = 'Urapakkam Congregation - Department Assignment';
-    w.insertBefore(titleDiv, w.firstChild);
+    // Title
+    var title = document.createElement('div');
+    title.textContent = 'Urapakkam Congregation - Department Assignment';
+    title.style.cssText = 'font-size:16pt;font-weight:900;color:#111827;padding:0 0 12px;border-bottom:3px solid #111827;margin-bottom:0;';
+    container.appendChild(title);
 
-    var table = document.querySelector('.schedule-table');
-    var totalWidth = table.scrollWidth;
-    var totalHeight = w.scrollHeight;
+    // Table
+    var tbl = document.createElement('table');
+    tbl.style.cssText = 'width:100%;border-collapse:collapse;table-layout:fixed;border-left:3px solid #111827;border-right:3px solid #111827;';
+    container.appendChild(tbl);
 
-    var canvas = await html2canvas(w, {
+    // Role col width
+    var numCols = meetings.length;
+    var roleW = '18%';
+    var colW = ((100 - 18) / numCols).toFixed(2) + '%';
+
+    // Colgroup
+    var colgroup = '<colgroup><col style="width:' + roleW + '">';
+    for (var cg = 0; cg < numCols; cg++) colgroup += '<col style="width:' + colW + '">';
+    colgroup += '</colgroup>';
+    tbl.innerHTML = colgroup;
+
+    // Thead
+    var thead = document.createElement('thead');
+    tbl.appendChild(thead);
+    var hRow = document.createElement('tr');
+    thead.appendChild(hRow);
+
+    var th0 = document.createElement('th');
+    th0.textContent = 'Role';
+    th0.style.cssText = 'text-align:left;font-size:10pt;font-weight:800;padding:10px 8px;border-bottom:3px solid #111827;color:#111827;text-transform:uppercase;letter-spacing:0.5px;';
+    hRow.appendChild(th0);
+
+    for (var h = 0; h < numCols; h++) {
+        var d = meetings[h];
+        var isM = isMidweek(d);
+        var cc = isM ? colColors.midweek : colColors.weekend;
+        var th = document.createElement('th');
+        th.textContent = DAY_SHORT[d.getDay()] + ', ' + d.getDate() + ' ' + MONTH_SHORT[d.getMonth()];
+        th.style.cssText = 'text-align:left;font-size:10pt;font-weight:800;padding:10px 8px;color:' + cc.color + ';border-bottom:3px solid ' + cc.border + ';';
+        hRow.appendChild(th);
+    }
+
+    // Tbody
+    var tbody = document.createElement('tbody');
+    tbl.appendChild(tbody);
+
+    var lastCat = '';
+    var allRoles = ROLES.concat(CLEANING_ROLES.map(function(cr) {
+        return { cat: 'cleaning', key: cr.key + '_grp', label: cr.label, icon: cr.icon };
+    }));
+
+    for (var r = 0; r < allRoles.length; r++) {
+        var role = allRoles[r];
+
+        // Category header row
+        if (role.cat !== lastCat) {
+            lastCat = role.cat;
+            var catInfo = CATEGORIES[role.cat];
+            var cc2 = catColors[role.cat];
+            var catRow = document.createElement('tr');
+            var catTd = document.createElement('td');
+            catTd.colSpan = numCols + 1;
+            catTd.textContent = catInfo.label.toUpperCase();
+            catTd.style.cssText = 'font-size:10pt;font-weight:900;padding:10px 16px;background:' + cc2.bg + ';color:' + cc2.color + ';border-bottom:3px solid ' + cc2.border + ';letter-spacing:0.5px;';
+            catRow.appendChild(catTd);
+            tbody.appendChild(catRow);
+        }
+
+        // Data row
+        var row = document.createElement('tr');
+        var roleTd = document.createElement('td');
+        roleTd.textContent = role.label;
+        roleTd.style.cssText = 'font-size:10pt;font-weight:700;padding:10px 16px;color:#111827;border-bottom:1px solid #d1d5db;white-space:nowrap;';
+        row.appendChild(roleTd);
+
+        for (var ci = 0; ci < numCols; ci++) {
+            var td = document.createElement('td');
+            var selId = 'sel_' + role.key + '_' + ci;
+            var val = vals[selId] || '-';
+            td.textContent = (val && val !== '-') ? val : '';
+            td.style.cssText = 'font-size:10pt;font-weight:600;padding:10px 8px;color:#111827;border-bottom:1px solid #d1d5db;white-space:nowrap;';
+            row.appendChild(td);
+        }
+        tbody.appendChild(row);
+    }
+
+    // Last row closing border
+    var lastRow = tbody.lastChild;
+    if (lastRow) {
+        var lastCells = lastRow.querySelectorAll('td');
+        for (var lc = 0; lc < lastCells.length; lc++) {
+            lastCells[lc].style.borderBottom = '3px solid #1f2937';
+        }
+    }
+
+    return container;
+}
+
+async function captureTable() {
+    var clone = buildPrintClone();
+
+    // Wait for fonts to render
+    await new Promise(function(resolve) { setTimeout(resolve, 100); });
+
+    var canvas = await html2canvas(clone, {
         scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
         scrollX: 0, scrollY: 0,
-        width: totalWidth,
-        height: totalHeight,
-        windowWidth: totalWidth + 60,
+        width: clone.scrollWidth,
+        height: clone.scrollHeight,
+        windowWidth: clone.scrollWidth + 60,
     });
 
-    // Restore selects and remove temp spans
-    for (var j = 0; j < selectData.length; j++) {
-        selectData[j].sel.style.display = '';
-        selectData[j].span.remove();
-    }
-    for (var rb = 0; rb < removeBtns.length; rb++) removeBtns[rb].style.display = '';
-    titleDiv.remove();
-
-    w.classList.remove('export-mode');
-    w.style.overflow = origOverflow;
+    clone.remove();
     return canvas;
 }
 
