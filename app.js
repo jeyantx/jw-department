@@ -431,9 +431,34 @@ async function captureTable() {
     w.style.overflow = 'visible';
     w.classList.add('export-mode');
 
+    // Replace select elements with plain text spans for clean image
+    var selects = w.querySelectorAll('select');
+    var selectData = [];
+    for (var i = 0; i < selects.length; i++) {
+        var sel = selects[i];
+        var span = document.createElement('span');
+        span.className = 'export-text';
+        span.textContent = (sel.value && sel.value !== '-') ? sel.value : '';
+        span.style.cssText = 'font-size:8.5pt;font-weight:600;color:#111827;white-space:nowrap;display:block;padding:0;';
+        sel.style.display = 'none';
+        sel.parentNode.insertBefore(span, sel.nextSibling);
+        selectData.push({ sel: sel, span: span });
+    }
+
+    // Hide remove buttons
+    var removeBtns = w.querySelectorAll('.btn-remove-col');
+    for (var r = 0; r < removeBtns.length; r++) removeBtns[r].style.display = 'none';
+
+    // Add title inside wrapper for image capture
+    var titleDiv = document.createElement('div');
+    titleDiv.className = 'export-title';
+    titleDiv.style.cssText = 'font-size:16pt;font-weight:900;color:#111827;padding:16px 8px 12px;border-bottom:3px solid #111827;margin-bottom:0;font-family:Noto Sans,sans-serif;';
+    titleDiv.textContent = 'Urapakkam Congregation - Department Assignment';
+    w.insertBefore(titleDiv, w.firstChild);
+
     var table = document.querySelector('.schedule-table');
     var totalWidth = table.scrollWidth;
-    var totalHeight = table.scrollHeight;
+    var totalHeight = w.scrollHeight;
 
     var canvas = await html2canvas(w, {
         scale: 2,
@@ -444,6 +469,14 @@ async function captureTable() {
         height: totalHeight,
         windowWidth: totalWidth + 60,
     });
+
+    // Restore selects and remove temp spans
+    for (var j = 0; j < selectData.length; j++) {
+        selectData[j].sel.style.display = '';
+        selectData[j].span.remove();
+    }
+    for (var rb = 0; rb < removeBtns.length; rb++) removeBtns[rb].style.display = '';
+    titleDiv.remove();
 
     w.classList.remove('export-mode');
     w.style.overflow = origOverflow;
