@@ -39,7 +39,7 @@ const ROLES = [
 
 const CLEANING_ROLES = [
     { key: 'clean_broom', label: 'Brooming & Toilet', icon: 'ph-duotone ph-broom' },
-    { key: 'clean_mop', label: 'Mopping', icon: 'ph-duotone ph-drop' },
+    { key: 'clean_mop', label: 'Mopping & Stage', icon: 'ph-duotone ph-drop' },
 ];
 
 const CATEGORIES = {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var picker = document.getElementById('meetingDatePicker');
     picker.value = toISODate(new Date());
     document.getElementById('conflictToggle').addEventListener('change', runConflictCheck);
-    render();
+    loadSchedule();
 });
 
 function initFirebase() {
@@ -173,7 +173,7 @@ function renderHead() {
         var colClass = isMidweek(d) ? 'col-midweek' : 'col-weekend';
         html += '<th class="meeting-col ' + colClass + '">';
         html += '<div class="meeting-header">';
-        html += DAY_SHORT[d.getDay()] + ', ' + d.getDate() + ' ' + MONTH_SHORT[d.getMonth()] + ' ' + d.getFullYear();
+        html += DAY_SHORT[d.getDay()] + ', ' + d.getDate() + ' ' + MONTH_SHORT[d.getMonth()];
         html += '</div>';
         html += '<button class="btn-remove-col no-print" onclick="removeMeeting(' + i + ')" title="Remove">';
         html += '<i class="ph-duotone ph-x-circle"></i> remove</button>';
@@ -294,8 +294,7 @@ function runConflictCheck() {
 // FIREBASE
 // ============================================================
 function getDocId() {
-    if (meetings.length === 0) return 'empty';
-    return toISODate(meetings[0]) + '_' + toISODate(meetings[meetings.length - 1]);
+    return 'current_schedule';
 }
 
 function gatherData() {
@@ -335,23 +334,37 @@ async function saveSchedule() {
 async function loadSchedule() {
     try {
         var doc = await db.collection(COLLECTION).doc(getDocId()).get();
-        if (!doc.exists) return;
+        if (!doc.exists) {
+            render();
+            return;
+        }
         var data = doc.data();
-        if (!data.columns) return;
 
-        for (var ci = 0; ci < meetings.length; ci++) {
-            var col = data.columns['col_' + ci];
-            if (!col) continue;
-            var keys = Object.keys(col);
-            for (var k = 0; k < keys.length; k++) {
-                var el = document.getElementById('sel_' + keys[k] + '_' + ci);
-                if (el) { el.value = col[keys[k]]; updateSelectStyle(el); }
+        // Restore meeting dates
+        if (data.meetingDates && data.meetingDates.length > 0) {
+            meetings = data.meetingDates.map(function(d) { return parseDate(d); });
+        }
+
+        // Render the table with restored meetings
+        render();
+
+        // Now populate the dropdowns with saved values
+        if (data.columns) {
+            for (var ci = 0; ci < meetings.length; ci++) {
+                var col = data.columns['col_' + ci];
+                if (!col) continue;
+                var keys = Object.keys(col);
+                for (var k = 0; k < keys.length; k++) {
+                    var el = document.getElementById('sel_' + keys[k] + '_' + ci);
+                    if (el) { el.value = col[keys[k]]; updateSelectStyle(el); }
+                }
             }
         }
 
         showToast('Schedule loaded');
     } catch (e) {
         console.error(e);
+        render();
     }
 }
 

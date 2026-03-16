@@ -16,7 +16,7 @@
 </head>
 <body>
     <script>
-        if (localStorage.getItem('ss_auth') !== 'true') {
+        if (!localStorage.getItem('ss_auth') || localStorage.getItem('ss_auth').length < 10) {
             window.location.href = 'login.html';
         }
     </script>

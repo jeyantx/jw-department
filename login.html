@@ -159,18 +159,29 @@
     </div>
 
     <script>
-        var PASS = '404040';
+        // SHA-256 hash of the password — never stored in plain text
+        var PASS_HASH = 'd6bbc3166b14dd5fa3ad6edaa1493bdfc5f5521d450e27b71cd5a5054ee142cc';
 
         // If already authenticated, redirect
-        if (localStorage.getItem('ss_auth') === 'true') {
+        if (localStorage.getItem('ss_auth') === PASS_HASH) {
             window.location.href = 'index.html';
         }
 
-        function handleLogin(e) {
+        // SHA-256 hash using Web Crypto API
+        async function sha256(message) {
+            var msgBuffer = new TextEncoder().encode(message);
+            var hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            var hashArray = Array.from(new Uint8Array(hashBuffer));
+            var hashHex = hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+            return hashHex;
+        }
+
+        async function handleLogin(e) {
             e.preventDefault();
             var pwd = document.getElementById('passwordInput').value;
-            if (pwd === PASS) {
-                localStorage.setItem('ss_auth', 'true');
+            var hash = await sha256(pwd);
+            if (hash === PASS_HASH) {
+                localStorage.setItem('ss_auth', PASS_HASH);
                 window.location.href = 'index.html';
             } else {
                 var err = document.getElementById('errorMsg');
