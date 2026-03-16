@@ -38,12 +38,13 @@
                 </label>
             </div>
             <div class="toolbar-right">
-                <button class="btn btn-icon" onclick="saveSchedule()" title="Save"><i class="ph-duotone ph-floppy-disk"></i></button>
-                <button class="btn btn-icon" onclick="clearSchedule()" title="Clear"><i class="ph-duotone ph-eraser"></i></button>
-                <button class="btn btn-icon" onclick="copyImage()" title="Copy as Image"><i class="ph-duotone ph-copy"></i></button>
-                <button class="btn btn-icon" onclick="downloadImage()" title="Download PNG"><i class="ph-duotone ph-download"></i></button>
-                <button class="btn btn-icon" onclick="window.print()" title="Print"><i class="ph-duotone ph-printer"></i></button>
-                <button class="btn btn-icon" onclick="logout()" title="Logout"><i class="ph-duotone ph-sign-out"></i></button>
+                <button class="btn btn-icon has-tooltip" onclick="saveSchedule()"><i class="ph-duotone ph-floppy-disk"></i><span class="tooltip">Save</span></button>
+                <button class="btn btn-icon has-tooltip" onclick="clearSchedule()"><i class="ph-duotone ph-eraser"></i><span class="tooltip">Clear</span></button>
+                <button class="btn btn-icon has-tooltip" onclick="copyImage()"><i class="ph-duotone ph-copy"></i><span class="tooltip">Copy Image</span></button>
+                <button class="btn btn-icon has-tooltip" onclick="downloadImage()"><i class="ph-duotone ph-download"></i><span class="tooltip">Download</span></button>
+                <button class="btn btn-icon has-tooltip" onclick="window.print()"><i class="ph-duotone ph-printer"></i><span class="tooltip">Print PDF</span></button>
+                <button class="btn btn-icon has-tooltip" onclick="showHelp()"><i class="ph-duotone ph-question"></i><span class="tooltip">Help</span></button>
+                <button class="btn btn-icon has-tooltip" onclick="logout()"><i class="ph-duotone ph-sign-out"></i><span class="tooltip">Logout</span></button>
             </div>
         </div>
 
@@ -66,6 +67,47 @@
         </div>
 
         <div class="toast" id="toast"></div>
+
+        <!-- Help Modal -->
+        <div class="help-overlay" id="helpOverlay" onclick="closeHelp(event)">
+            <div class="help-modal">
+                <div class="help-header">
+                    <h2><i class="ph-duotone ph-question"></i> How it works</h2>
+                    <button class="btn btn-icon" onclick="document.getElementById('helpOverlay').classList.remove('visible')"><i class="ph-duotone ph-x"></i></button>
+                </div>
+                <div class="help-body">
+                    <div class="help-section">
+                        <h3><i class="ph-duotone ph-plus-circle"></i> Adding Meetings</h3>
+                        <p>Pick a date using the date picker, then click <strong>Add Schedule</strong> to add a meeting column. You can add up to <strong>8 meetings</strong> per schedule. Click <strong>remove</strong> under a date to remove it.</p>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="ph-duotone ph-list-checks"></i> Filling Assignments</h3>
+                        <p>Each brother can fill data for their department — Sound, Attendant, or Cleaning. Select the assigned brother or cleaning group from the dropdown for each role and meeting.</p>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="ph-duotone ph-floppy-disk"></i> Save</h3>
+                        <p>Once saved, all data is stored in the backend. When you reload the page, all data is fetched and displayed automatically.</p>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="ph-duotone ph-eraser"></i> Clear + Save</h3>
+                        <p>When you clear and then save, all data is erased from the backend. This resets the schedule completely.</p>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="ph-duotone ph-export"></i> Sharing & Printing</h3>
+                        <p>Once everything is filled, you can:</p>
+                        <ul>
+                            <li><i class="ph-duotone ph-printer"></i> <strong>Print</strong> — generates a clean A4 landscape PDF for printout</li>
+                            <li><i class="ph-duotone ph-copy"></i> <strong>Copy Image</strong> — copies the schedule to clipboard, ready to paste in WhatsApp or any app</li>
+                            <li><i class="ph-duotone ph-download"></i> <strong>Download</strong> — saves the schedule as a PNG image to share in WhatsApp group</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3><i class="ph-duotone ph-warning"></i> Conflicts</h3>
+                        <p>Toggle <strong>Conflicts</strong> to highlight when the same brother is assigned to multiple roles on the same meeting date.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

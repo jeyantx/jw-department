@@ -24,7 +24,7 @@ const BROTHERS = [
 ];
 
 const CLEANING_GROUPS = [
-    '-', 'Aadhanur', 'Urapakkam', 'Keerapakkam', 'Mahalakshmi Nagar', 'Madambakkam'
+    '-', 'Aadhanur', 'Urapakkam', 'Keerapakkam', 'Mahalakshmi', 'Madambakkam'
 ];
 
 const ROLES = [
@@ -600,6 +600,19 @@ async function downloadImage() {
 function logout() {
     localStorage.removeItem('ss_auth');
     window.location.href = 'login.html';
+}
+
+// ============================================================
+// HELP MODAL
+// ============================================================
+function showHelp() {
+    document.getElementById('helpOverlay').classList.add('visible');
+}
+
+function closeHelp(e) {
+    if (e.target === document.getElementById('helpOverlay')) {
+        document.getElementById('helpOverlay').classList.remove('visible');
+    }
 }
 
 // ============================================================

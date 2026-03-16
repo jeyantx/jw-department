@@ -59,7 +59,7 @@ body {
 
 .app {
     padding: 16px;
-    max-width: 1200px;
+    max-width: 2000px;
     margin: 0 auto;
 }
 
@@ -199,6 +199,151 @@ body {
 .btn-icon:hover {
     background: var(--gray-100);
     color: var(--gray-900);
+}
+
+/* ================================================================
+   TOOLTIPS
+   ================================================================ */
+.has-tooltip {
+    position: relative;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-800);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 100;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--gray-800);
+}
+
+.has-tooltip:hover .tooltip {
+    opacity: 1;
+}
+
+/* ================================================================
+   HELP MODAL
+   ================================================================ */
+.help-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+
+.help-overlay.visible {
+    display: flex;
+}
+
+.help-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    width: 520px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.help-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.help-header h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.help-header h2 i {
+    color: var(--blue-600);
+    font-size: 1.3rem;
+}
+
+.help-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
+.help-section {
+    margin-bottom: 20px;
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.help-section h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.help-section h3 i {
+    color: var(--blue-600);
+    font-size: 1rem;
+}
+
+.help-section p {
+    font-size: 0.82rem;
+    color: var(--gray-600);
+    line-height: 1.6;
+}
+
+.help-section ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+}
+
+.help-section ul li {
+    font-size: 0.82rem;
+    color: var(--gray-600);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.help-section ul li i {
+    color: var(--gray-500);
+    font-size: 0.95rem;
 }
 
 /* ================================================================
