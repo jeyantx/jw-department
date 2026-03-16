@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Urapakkam Congregation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/duotone/style.css">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .login-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .login-icon {
+            font-size: 3rem;
+            color: #2563eb;
+            margin-bottom: 12px;
+        }
+
+        .login-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 0.82rem;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-family: 'Noto Sans', system-ui, sans-serif;
+            font-weight: 600;
+            color: #1f2937;
+            outline: none;
+            transition: border-color 0.2s;
+            letter-spacing: 4px;
+        }
+
+        .login-input:focus {
+            border-color: #2563eb;
+        }
+
+        .login-input::placeholder {
+            letter-spacing: 0;
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'Noto Sans', system-ui, sans-serif;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .login-btn:hover {
+            filter: brightness(0.92);
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 14px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                margin: 16px;
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <i class="ph-duotone ph-lock-key login-icon"></i>
+        <div class="login-title">Urapakkam Congregation</div>
+        <div class="login-subtitle">Department Assignment Schedule</div>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="input-group">
+                <i class="ph-duotone ph-password"></i>
+                <input type="password" id="passwordInput" class="login-input" placeholder="Enter password" autofocus>
+            </div>
+            <button type="submit" class="login-btn">
+                <i class="ph-duotone ph-sign-in"></i> Sign In
+            </button>
+        </form>
+        <div class="error-msg" id="errorMsg">Incorrect password. Please try again.</div>
+    </div>
+
+    <script>
+        var PASS = '404040';
+
+        // If already authenticated, redirect
+        if (localStorage.getItem('ss_auth') === 'true') {
+            window.location.href = 'index.html';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            var pwd = document.getElementById('passwordInput').value;
+            if (pwd === PASS) {
+                localStorage.setItem('ss_auth', 'true');
+                window.location.href = 'index.html';
+            } else {
+                var err = document.getElementById('errorMsg');
+                err.classList.add('show');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+                setTimeout(function() { err.classList.remove('show'); }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

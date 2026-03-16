@@ -1,0 +1,665 @@
+/* ================================================================
+   A4 PRINT
+   ================================================================ */
+@page {
+    size: A4 landscape;
+    margin: 10mm 12mm;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --font: 'Noto Sans', system-ui, -apple-system, sans-serif;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --blue-800: #1e40af;
+    --amber-50: #fffbeb;
+    --amber-600: #d97706;
+    --amber-800: #92400e;
+    --emerald-50: #ecfdf5;
+    --emerald-100: #d1fae5;
+    --emerald-600: #059669;
+    --emerald-700: #047857;
+    --orange-50: #fff7ed;
+    --orange-100: #ffedd5;
+    --orange-700: #c2410c;
+    --red-500: #ef4444;
+    --indigo-500: #6366f1;
+
+    --col-width: 155px;
+    --role-width: 200px;
+}
+
+body {
+    font-family: var(--font);
+    background: var(--gray-100);
+    color: var(--gray-900);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app {
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ================================================================
+   TOOLBAR
+   ================================================================ */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.toolbar-left,
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--gray-200);
+}
+
+.add-meeting-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.date-input {
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 7px 10px;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.date-input:focus {
+    border-color: var(--blue-600);
+}
+
+/* Toggle */
+.conflict-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.conflict-toggle input { display: none; }
+
+.toggle-track {
+    width: 34px;
+    height: 20px;
+    background: var(--gray-300);
+    border-radius: 20px;
+    position: relative;
+    transition: background 0.25s;
+}
+
+.toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.25s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.conflict-toggle input:checked ~ .toggle-track {
+    background: var(--indigo-500);
+}
+
+.conflict-toggle input:checked ~ .toggle-track .toggle-thumb {
+    transform: translateX(14px);
+}
+
+.toggle-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.btn:hover { filter: brightness(0.92); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+    background: var(--blue-600);
+    color: white;
+}
+
+.btn-icon {
+    padding: 7px 10px;
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    color: var(--gray-600);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.btn-icon:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+}
+
+/* ================================================================
+   EMPTY STATE
+   ================================================================ */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-400);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.empty-state p { font-size: 0.95rem; }
+.empty-state.hidden { display: none; }
+
+/* ================================================================
+   TABLE WRAPPER
+   ================================================================ */
+.table-wrapper {
+    display: none;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-wrapper.visible {
+    display: block;
+}
+
+/* ================================================================
+   SCHEDULE TABLE
+   ================================================================ */
+.schedule-table {
+    border-collapse: collapse;
+}
+
+/* ---------- HEADER ---------- */
+.schedule-table thead th {
+    padding: 10px 8px;
+    font-weight: 800;
+    font-size: 9pt;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 3px solid var(--gray-800);
+    background: var(--gray-50);
+    white-space: nowrap;
+    width: var(--col-width);
+    min-width: var(--col-width);
+    max-width: var(--col-width);
+}
+
+.schedule-table thead th.role-col {
+    text-align: left;
+    padding-left: 16px;
+    font-size: 8.5pt;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: var(--role-width);
+    min-width: var(--role-width);
+    max-width: var(--role-width);
+}
+
+/* Meeting column header - single line */
+.meeting-header {
+    font-size: 9pt;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Midweek = blue */
+.col-midweek {
+    color: var(--blue-800);
+    border-bottom-color: var(--blue-600) !important;
+}
+
+/* Weekend = amber */
+.col-weekend {
+    color: var(--amber-800);
+    border-bottom-color: var(--amber-600) !important;
+}
+
+/* Remove btn */
+.btn-remove-col {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-family: var(--font);
+    padding: 2px 4px;
+    margin-top: 3px;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.btn-remove-col:hover {
+    color: var(--red-500);
+    background: rgba(239,68,68,0.08);
+}
+
+/* ---------- BODY ---------- */
+.schedule-table tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--gray-200);
+    text-align: left;
+    vertical-align: middle;
+    width: var(--col-width);
+    min-width: var(--col-width);
+    max-width: var(--col-width);
+    overflow: visible;
+}
+
+/* Last row bottom border thicker */
+.schedule-table tbody tr:last-child td {
+    border-bottom: 2px solid var(--gray-300);
+}
+
+/* Role label cell */
+td.role-label {
+    text-align: left;
+    padding-left: 22px;
+    font-weight: 600;
+    font-size: 9.5pt;
+    color: var(--gray-700);
+    white-space: nowrap;
+    width: var(--role-width);
+    min-width: var(--role-width);
+    max-width: var(--role-width);
+}
+
+td.role-label i {
+    margin-right: 6px;
+    font-size: 11pt;
+    vertical-align: -1px;
+    color: var(--gray-400);
+}
+
+/* ---------- CATEGORY ROWS ---------- */
+.cat-header td {
+    padding: 9px 16px;
+    font-weight: 900;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border-bottom: 3px solid;
+}
+
+.cat-header td:first-child i {
+    font-size: 13pt;
+    margin-right: 6px;
+    vertical-align: -2px;
+}
+
+tr.cat-header.cat-sound td {
+    background: var(--blue-50) !important;
+    color: var(--blue-700);
+    border-bottom-color: var(--blue-600) !important;
+}
+
+tr.cat-header.cat-attendant td {
+    background: var(--orange-50) !important;
+    color: var(--orange-700);
+    border-bottom-color: var(--orange-700) !important;
+}
+
+tr.cat-header.cat-cleaning td {
+    background: var(--emerald-50) !important;
+    color: var(--emerald-700);
+    border-bottom-color: var(--emerald-600) !important;
+}
+
+/* ---------- DROPDOWNS ---------- */
+.schedule-table select {
+    width: 100%;
+    padding: 4px 5px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 5px;
+    font-size: 8pt;
+    font-family: var(--font);
+    font-weight: 500;
+    color: var(--gray-700);
+    background: white;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    text-align: left;
+    text-align-last: left;
+    overflow: visible;
+    text-overflow: ellipsis;
+}
+
+.schedule-table select:focus {
+    border-color: var(--blue-600);
+}
+
+.schedule-table select.has-value {
+    border-color: var(--indigo-500);
+    background: #f5f3ff;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+/* ---------- CONFLICT ---------- */
+.conflict-cell { position: relative; }
+
+.conflict-cell select {
+    border-color: var(--red-500) !important;
+    background: #fef2f2 !important;
+}
+
+.conflict-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: var(--red-500);
+    border-radius: 50%;
+    border: 1.5px solid white;
+}
+
+/* ================================================================
+   PRINT HEADER (only visible in print)
+   ================================================================ */
+.print-header {
+    display: none;
+}
+
+.print-header h1 {
+    font-size: 14pt;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--gray-900);
+}
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gray-900);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ================================================================
+   EXPORT MODE (html2canvas)
+   ================================================================ */
+.export-mode {
+    overflow: visible !important;
+}
+
+.export-mode .schedule-table {
+    overflow: visible;
+}
+
+.export-mode .schedule-table select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none !important;
+    background: transparent !important;
+    text-align: left;
+    text-align-last: left;
+    font-weight: 600;
+    font-size: 8.5pt;
+    color: var(--gray-900);
+    pointer-events: none;
+    overflow: visible;
+    white-space: nowrap;
+}
+
+.export-mode .btn-remove-col {
+    display: none !important;
+}
+
+/* ================================================================
+   PRINT
+   ================================================================ */
+@media print {
+    html, body {
+        background: white;
+        margin: 0;
+        padding: 0;
+    }
+
+    .no-print, .toolbar, .empty-state, .toast { display: none !important; }
+
+    .print-header {
+        display: block;
+        padding: 4px 0 10px 0;
+    }
+
+    .print-header h1 {
+        font-size: 14pt;
+        font-weight: 900;
+        margin-bottom: 0;
+        border-bottom: 2px solid var(--gray-300);
+        padding-bottom: 6px;
+    }
+
+    .app {
+        padding: 0;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .table-wrapper {
+        display: block !important;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+        padding: 0;
+    }
+
+    /* Table fills page width, natural height */
+    .schedule-table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    /* Remove fixed widths in print */
+    .schedule-table thead th,
+    .schedule-table tbody td {
+        width: auto;
+        min-width: 0;
+        max-width: none;
+    }
+
+    /* Role column proportion */
+    .schedule-table thead th.role-col,
+    td.role-label {
+        width: 18%;
+        min-width: 0;
+        max-width: none;
+    }
+
+    /* Header */
+    .schedule-table thead th {
+        font-size: 10pt;
+        font-weight: 800;
+        padding: 10px 8px;
+        border-bottom-width: 3px;
+    }
+
+    .meeting-header {
+        font-size: 10pt;
+    }
+
+    /* Body rows - stronger borders */
+    .schedule-table tbody td {
+        padding: 10px 8px;
+        font-size: 10pt;
+        border-bottom: 1px solid var(--gray-300);
+    }
+
+    /* Last row closing border */
+    .schedule-table tbody tr:last-child td {
+        border-bottom: 3px solid var(--gray-800);
+    }
+
+    td.role-label {
+        font-size: 10pt;
+        font-weight: 700;
+        padding-left: 16px;
+    }
+
+    td.role-label i {
+        font-size: 12pt;
+    }
+
+    /* Category headers - thicker, bolder */
+    .cat-header td {
+        padding: 10px 16px;
+        font-size: 10pt;
+        font-weight: 900;
+        border-bottom-width: 3px;
+    }
+
+    .cat-header td:first-child i {
+        font-size: 14pt;
+    }
+
+    /* Select values as plain text */
+    .schedule-table select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border: none;
+        background: transparent !important;
+        font-size: 10pt;
+        font-weight: 600;
+        color: var(--gray-900);
+        text-align: left;
+        text-align-last: left;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .btn-remove-col {
+        display: none !important;
+    }
+}
+
+/* ================================================================
+   MOBILE - Edit/Add only, no export buttons
+   ================================================================ */
+@media (max-width: 768px) {
+    .app { padding: 8px; }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .toolbar-left {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Hide export/print buttons on mobile */
+    .toolbar-right {
+        display: none !important;
+    }
+
+    .toolbar-divider { display: none; }
+
+    /* Enable horizontal scroll */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .schedule-table {
+        min-width: 600px;
+    }
+}
