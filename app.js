@@ -28,7 +28,7 @@ const CLEANING_GROUPS = [
 ];
 
 const ROLES = [
-    { cat: 'sound', key: 'sound_mic', label: 'Audio Mixer', icon: 'ph-faders' },
+    { cat: 'sound', key: 'sound_mic', label: 'Audio Mixer', icon: 'ph-duotone ph-faders' },
     { cat: 'sound', key: 'sound_media', label: 'Media & Zoom', icon: 'ph-duotone ph-monitor-play' },
     { cat: 'sound', key: 'mic_left', label: 'Mic - Left / Stage', icon: 'ph-duotone ph-microphone' },
     { cat: 'sound', key: 'mic_right', label: 'Mic - Right', icon: 'ph-duotone ph-microphone' },
