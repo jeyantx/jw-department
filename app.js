@@ -28,7 +28,7 @@ const CLEANING_GROUPS = [
 ];
 
 const ROLES = [
-    { cat: 'sound', key: 'sound_mic', label: 'Audio Mixer', icon: 'ph-duotone ph-faders' },
+    { cat: 'sound', key: 'sound_mic', label: 'Audio Mixer', icon: 'ph-faders' },
     { cat: 'sound', key: 'sound_media', label: 'Media & Zoom', icon: 'ph-duotone ph-monitor-play' },
     { cat: 'sound', key: 'mic_left', label: 'Mic - Left / Stage', icon: 'ph-duotone ph-microphone' },
     { cat: 'sound', key: 'mic_right', label: 'Mic - Right', icon: 'ph-duotone ph-microphone' },
@@ -45,7 +45,7 @@ const CLEANING_ROLES = [
 const CATEGORIES = {
     sound:     { label: 'Sound',     icon: 'ph-duotone ph-speaker-high',         css: 'cat-sound' },
     attendant: { label: 'Attendant', icon: 'ph-duotone ph-identification-badge', css: 'cat-attendant' },
-    cleaning:  { label: 'Cleaning',  icon: 'ph-duotone ph-broom',               css: 'cat-cleaning' },
+    cleaning:  { label: 'Cleaning',  icon: 'ph-duotone ph-sparkle',             css: 'cat-cleaning' },
 };
 
 var DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
