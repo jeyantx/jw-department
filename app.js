@@ -15,7 +15,7 @@ const COLLECTION = 'sound_schedule';
 const BROTHERS = [
     '-',
     'Br. Anand', 'Br. Ben Cyrus', 'Br. Bovaz', 'Br. Daniel', 'Br. Devakumar',
-    'Br. Dominic', 'Br. Hari', 'Br. Inbaraj', 'Br. Jagadeesan', 'Br. Jeyant',
+    'Br. Dominic', 'Br. Hari', 'Br. Inbaraj', 'Br. Jagan', 'Br. Jeyant',
     'Br. Joseph', 'Br. Jotham', 'Br. Karuppusamy', 'Br. Muthumohan', 'Br. Pandian',
     'Br. Prabakar', 'Br. Praveen', 'Br. Prem', 'Br. Raja', 'Br. Rejikumar',
     'Br. Shadrach', 'Br. Sivakumar', 'Br. Sree Nithish', 'Br. Sreekanth',
@@ -30,8 +30,8 @@ const CLEANING_GROUPS = [
 const ROLES = [
     { cat: 'sound', key: 'sound_mic', label: 'Audio Mixer', icon: 'ph-duotone ph-speaker-high' },
     { cat: 'sound', key: 'sound_media', label: 'Media & Zoom', icon: 'ph-duotone ph-monitor-play' },
-    { cat: 'sound', key: 'mic_left', label: 'Mic Roving - Left / Stage', icon: 'ph-duotone ph-microphone' },
-    { cat: 'sound', key: 'mic_right', label: 'Mic Roving - Right', icon: 'ph-duotone ph-microphone' },
+    { cat: 'sound', key: 'mic_left', label: 'Mic - Left / Stage', icon: 'ph-duotone ph-microphone' },
+    { cat: 'sound', key: 'mic_right', label: 'Mic - Right', icon: 'ph-duotone ph-microphone' },
     { cat: 'attendant', key: 'att_hall', label: 'Hall', icon: 'ph-duotone ph-buildings' },
     { cat: 'attendant', key: 'att_entrance', label: 'Entrance', icon: 'ph-duotone ph-door' },
     { cat: 'attendant', key: 'att_parking', label: 'Parking', icon: 'ph-duotone ph-car' },
@@ -136,7 +136,40 @@ function removeMeeting(index) {
 // ============================================================
 // RENDER
 // ============================================================
+
+// Save current dropdown values keyed by date string (not column index)
+function gatherCurrentValues() {
+    var saved = {};
+    for (var ci = 0; ci < meetings.length; ci++) {
+        var dateKey = toISODate(meetings[ci]);
+        var col = {};
+        var sels = document.querySelectorAll('select[data-col="' + ci + '"]');
+        for (var s = 0; s < sels.length; s++) {
+            col[sels[s].dataset.role] = sels[s].value;
+        }
+        saved[dateKey] = col;
+    }
+    return saved;
+}
+
+// Restore dropdown values after re-render using date keys
+function restoreValues(saved) {
+    for (var ci = 0; ci < meetings.length; ci++) {
+        var dateKey = toISODate(meetings[ci]);
+        var col = saved[dateKey];
+        if (!col) continue;
+        var keys = Object.keys(col);
+        for (var k = 0; k < keys.length; k++) {
+            var el = document.getElementById('sel_' + keys[k] + '_' + ci);
+            if (el) { el.value = col[keys[k]]; updateSelectStyle(el); }
+        }
+    }
+}
+
 function render() {
+    // Save existing values before re-rendering
+    var saved = gatherCurrentValues();
+
     var wrapper = document.querySelector('.table-wrapper');
     var empty = document.getElementById('emptyState');
 
@@ -153,6 +186,9 @@ function render() {
 
     renderHead();
     renderBody();
+
+    // Restore saved values
+    restoreValues(saved);
 
     // Attach select listeners
     var selects = document.querySelectorAll('.schedule-table select');
