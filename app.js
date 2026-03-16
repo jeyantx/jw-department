@@ -131,12 +131,14 @@ function addMeetingFromPicker() {
     picker.value = toISODate(next);
 
     render();
+    markDirty();
     if (document.getElementById('conflictToggle').checked) runConflictCheck();
 }
 
 function removeMeeting(index) {
     meetings.splice(index, 1);
     render();
+    markDirty();
 }
 
 // ============================================================
@@ -201,6 +203,7 @@ function render() {
     for (var s = 0; s < selects.length; s++) {
         selects[s].addEventListener('change', function() {
             updateSelectStyle(this);
+            markDirty();
             if (document.getElementById('conflictToggle').checked) runConflictCheck();
         });
     }
@@ -366,6 +369,7 @@ async function saveSchedule() {
     if (!meetings.length) { showToast('Add at least one meeting'); return; }
     try {
         await db.collection(COLLECTION).doc(getDocId()).set(gatherData());
+        hasUnsavedChanges = false;
         showToast('Schedule saved!');
     } catch (e) {
         console.error(e);
@@ -424,6 +428,7 @@ function clearSchedule() {
     for (var j = 0; j < conflicts.length; j++) conflicts[j].classList.remove('conflict-cell');
     var dots = document.querySelectorAll('.conflict-dot');
     for (var k = 0; k < dots.length; k++) dots[k].remove();
+    markDirty();
     showToast('Cleared');
 }
 
@@ -620,6 +625,22 @@ function closeHelp(e) {
         document.getElementById('helpOverlay').classList.remove('visible');
     }
 }
+
+// ============================================================
+// UNSAVED CHANGES WARNING
+// ============================================================
+var hasUnsavedChanges = false;
+
+function markDirty() {
+    hasUnsavedChanges = true;
+}
+
+window.addEventListener('beforeunload', function(e) {
+    if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
 
 // ============================================================
 // TOAST
