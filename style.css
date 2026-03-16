@@ -46,7 +46,7 @@
     --indigo-500: #6366f1;
 
     --col-width: 155px;
-    --role-width: 200px;
+    --role-width: 230px;
 }
 
 body {
@@ -507,22 +507,22 @@ tr.cat-header.cat-cleaning td {
     html, body {
         background: white;
         margin: 0;
-        padding: 0;
+        padding: 0px 20px 0px 20px;
     }
 
     .no-print, .toolbar, .empty-state, .toast { display: none !important; }
 
     .print-header {
         display: block;
-        padding: 4px 0 10px 0;
+        padding: 50px 0 0 0;
     }
 
     .print-header h1 {
-        font-size: 14pt;
+        font-size: 20pt;
         font-weight: 900;
         margin-bottom: 0;
-        border-bottom: 2px solid var(--gray-300);
-        padding-bottom: 6px;
+        border-bottom: 3px solid var(--gray-900);
+        padding-bottom: 50px;
     }
 
     .app {
@@ -538,6 +538,9 @@ tr.cat-header.cat-cleaning td {
         box-shadow: none;
         overflow: visible;
         padding: 0;
+        padding-top: 0px;   
+        border-left: 3px solid var(--gray-900);
+        border-right: 3px solid var(--gray-900);
     }
 
     /* Table fills page width, natural height */
@@ -622,6 +625,12 @@ tr.cat-header.cat-cleaning td {
         text-align-last: left;
         padding: 0;
         overflow: visible;
+    }
+
+    /* Smaller font for long cleaning group names in print */
+    .schedule-table select[data-role="clean_broom_grp"],
+    .schedule-table select[data-role="clean_mop_grp"] {
+        font-size: 8pt;
     }
 
     .btn-remove-col {
