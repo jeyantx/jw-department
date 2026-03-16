@@ -60,13 +60,19 @@ var meetings = [];
 // ============================================================
 // INIT
 // ============================================================
-document.addEventListener('DOMContentLoaded', function() {
+function initApp() {
     initFirebase();
     var picker = document.getElementById('meetingDatePicker');
     picker.value = toISODate(new Date());
     document.getElementById('conflictToggle').addEventListener('change', runConflictCheck);
     loadSchedule();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 function initFirebase() {
     firebase.initializeApp(FIREBASE_CONFIG);
