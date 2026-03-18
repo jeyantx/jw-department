@@ -55,6 +55,9 @@ var MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'
 // ============================================================
 var db = null;
 var meetings = [];
+var dirtyCells = {};    // tracks which select IDs user actually changed
+var wasCleared = false; // set by clearSchedule()
+var structureChanged = false; // set when meetings added/removed
 
 // ============================================================
 // INIT
@@ -130,6 +133,7 @@ function addMeetingFromPicker() {
     picker.value = toISODate(next);
 
     render();
+    structureChanged = true;
     markDirty();
     if (document.getElementById('conflictToggle').checked) runConflictCheck();
 }
@@ -137,6 +141,7 @@ function addMeetingFromPicker() {
 function removeMeeting(index) {
     meetings.splice(index, 1);
     render();
+    structureChanged = true;
     markDirty();
 }
 
@@ -202,6 +207,7 @@ function render() {
     for (var s = 0; s < selects.length; s++) {
         selects[s].addEventListener('change', function() {
             updateSelectStyle(this);
+            dirtyCells[this.id] = true;
             markDirty();
             if (document.getElementById('conflictToggle').checked) runConflictCheck();
         });
@@ -349,6 +355,7 @@ function gatherData() {
     };
 
     for (var ci = 0; ci < meetings.length; ci++) {
+        var dateKey = toISODate(meetings[ci]);
         var col = {};
         for (var r = 0; r < ROLES.length; r++) {
             var el = document.getElementById('sel_' + ROLES[r].key + '_' + ci);
@@ -358,22 +365,92 @@ function gatherData() {
             var g = document.getElementById('sel_' + CLEANING_ROLES[cr].key + '_grp_' + ci);
             if (g) col[CLEANING_ROLES[cr].key + '_grp'] = g.value;
         }
-        data.columns['col_' + ci] = col;
+        data.columns[dateKey] = col;
     }
 
     return data;
 }
 
+// Get all role keys for merge iteration
+function getAllRoleKeys() {
+    var keys = [];
+    for (var r = 0; r < ROLES.length; r++) keys.push(ROLES[r].key);
+    for (var c = 0; c < CLEANING_ROLES.length; c++) keys.push(CLEANING_ROLES[c].key + '_grp');
+    return keys;
+}
+
 async function saveSchedule() {
     if (!meetings.length) { showToast('Add at least one meeting'); return; }
     try {
-        await db.collection(COLLECTION).doc(getDocId()).set(gatherData());
+        var localData = gatherData();
+
+        // Decide: merge or overwrite
+        if (wasCleared || structureChanged) {
+            // Full overwrite — structural change or intentional clear
+            await db.collection(COLLECTION).doc(getDocId()).set(localData);
+        } else {
+            // Fetch latest backend data for merge
+            var doc = await db.collection(COLLECTION).doc(getDocId()).get();
+            if (!doc.exists) {
+                // No backend data — full overwrite
+                await db.collection(COLLECTION).doc(getDocId()).set(localData);
+            } else {
+                var remoteData = doc.data();
+                var remoteDates = (remoteData.meetingDates || []).join(',');
+                var localDates = localData.meetingDates.join(',');
+
+                if (remoteDates !== localDates) {
+                    // Dates changed by someone else — overwrite with local
+                    await db.collection(COLLECTION).doc(getDocId()).set(localData);
+                } else {
+                    // Same dates — merge cell by cell
+                    var merged = mergeColumns(localData, remoteData);
+                    localData.columns = merged;
+                    await db.collection(COLLECTION).doc(getDocId()).set(localData);
+                }
+            }
+        }
+
+        // Reset all tracking flags
         hasUnsavedChanges = false;
+        dirtyCells = {};
+        wasCleared = false;
+        structureChanged = false;
         showToast('Schedule saved!');
     } catch (e) {
         console.error(e);
         showToast('Error saving');
     }
+}
+
+function mergeColumns(localData, remoteData) {
+    var merged = {};
+    var roleKeys = getAllRoleKeys();
+    var remoteCols = remoteData.columns || {};
+
+    for (var di = 0; di < localData.meetingDates.length; di++) {
+        var dateKey = localData.meetingDates[di];
+        var localCol = localData.columns[dateKey] || {};
+        var remoteCol = remoteCols[dateKey] || {};
+        var mergedCol = {};
+
+        for (var rk = 0; rk < roleKeys.length; rk++) {
+            var key = roleKeys[rk];
+            var cellId = 'sel_' + key + '_' + di;
+
+            if (dirtyCells[cellId]) {
+                // User touched this cell — use their value (even if '-')
+                mergedCol[key] = localCol[key] || '-';
+            } else {
+                // User didn't touch — keep backend value
+                mergedCol[key] = remoteCol[key] || localCol[key] || '-';
+            }
+        }
+
+        merged[dateKey] = mergedCol;
+    }
+
+    return merged;
 }
 
 async function loadSchedule() {
@@ -393,10 +470,11 @@ async function loadSchedule() {
         // Render the table with restored meetings
         render();
 
-        // Now populate the dropdowns with saved values
+        // Populate dropdowns — support both date-keyed and legacy col_X format
         if (data.columns) {
             for (var ci = 0; ci < meetings.length; ci++) {
-                var col = data.columns['col_' + ci];
+                var dateKey = toISODate(meetings[ci]);
+                var col = data.columns[dateKey] || data.columns['col_' + ci];
                 if (!col) continue;
                 var keys = Object.keys(col);
                 for (var k = 0; k < keys.length; k++) {
@@ -405,6 +483,12 @@ async function loadSchedule() {
                 }
             }
         }
+
+        // Reset tracking — freshly loaded, nothing dirty
+        dirtyCells = {};
+        wasCleared = false;
+        structureChanged = false;
+        hasUnsavedChanges = false;
 
         showToast('Schedule loaded');
     } catch (e) {
@@ -427,6 +511,7 @@ function clearSchedule() {
     for (var j = 0; j < conflicts.length; j++) conflicts[j].classList.remove('conflict-cell');
     var dots = document.querySelectorAll('.conflict-dot');
     for (var k = 0; k < dots.length; k++) dots[k].remove();
+    wasCleared = true;
     markDirty();
     showToast('Cleared');
 }
