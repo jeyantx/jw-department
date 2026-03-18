@@ -34,7 +34,7 @@ const ROLES = [
     { cat: 'sound', key: 'mic_right', label: 'Mic - Right', icon: 'ph-duotone ph-microphone' },
     { cat: 'attendant', key: 'att_hall', label: 'Hall', icon: 'ph-duotone ph-buildings' },
     { cat: 'attendant', key: 'att_entrance', label: 'Entrance', icon: 'ph-duotone ph-door' },
-    { cat: 'attendant', key: 'att_parking', label: 'Parking', icon: 'ph-duotone ph-car' },
+    { cat: 'attendant', key: 'att_video', label: 'Video Conferencing', icon: 'ph-duotone ph-video-camera' },
 ];
 
 const CLEANING_ROLES = [
