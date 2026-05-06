@@ -42,7 +42,7 @@ const CLEANING_ROLES = [
 ];
 
 const CATEGORIES = {
-    sound:     { label: 'Sound',     icon: 'ph-duotone ph-speaker-high',         css: 'cat-sound' },
+    sound:     { label: 'Audio / Video',     icon: 'ph-duotone ph-speaker-high',         css: 'cat-sound' },
     attendant: { label: 'Attendant', icon: 'ph-duotone ph-identification-badge', css: 'cat-attendant' },
     cleaning:  { label: 'Cleaning',  icon: 'ph-duotone ph-sparkle',             css: 'cat-cleaning' },
 };
@@ -216,7 +216,7 @@ function render() {
 
 function renderHead() {
     var html = '<tr>';
-    html += '<th class="role-col">Role</th>';
+    html += '<th class="role-col"></th>';
 
     for (var i = 0; i < meetings.length; i++) {
         var d = meetings[i];

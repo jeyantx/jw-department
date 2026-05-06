@@ -763,7 +763,7 @@ tr.cat-header.cat-cleaning td {
         appearance: none;
         border: none;
         background: transparent !important;
-        font-size: 10pt;
+        font-size: 8pt;
         font-weight: 600;
         color: var(--gray-900);
         text-align: left;
