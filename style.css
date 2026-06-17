@@ -16,7 +16,7 @@
 }
 
 :root {
-    --font: 'Noto Sans', system-ui, -apple-system, sans-serif;
+    --font: 'Noto Sans', 'Noto Sans Tamil', system-ui, -apple-system, sans-serif;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -526,6 +526,21 @@ tr.cat-header.cat-cleaning td {
     border-bottom-color: var(--emerald-600) !important;
 }
 
+/* ---------- SECTION GAP (print only) ---------- */
+tr.section-gap { display: none; }
+
+/* ---------- DISABLED CELL ---------- */
+td.disabled-cell {
+    background: var(--gray-50);
+}
+
+td.disabled-cell select {
+    background: transparent !important;
+    color: var(--gray-400) !important;
+    border-color: var(--gray-200) !important;
+    cursor: not-allowed;
+}
+
 /* ---------- DROPDOWNS ---------- */
 .schedule-table select {
     width: 100%;
@@ -652,22 +667,22 @@ tr.cat-header.cat-cleaning td {
     html, body {
         background: white;
         margin: 0;
-        padding: 0px 20px 0px 20px;
+        padding: 0;
     }
 
     .no-print, .toolbar, .empty-state, .toast { display: none !important; }
 
     .print-header {
         display: block;
-        padding: 50px 0 0 0;
+        padding: 0 0 50px 0;
     }
 
     .print-header h1 {
-        font-size: 20pt;
+        font-size: 16pt;
         font-weight: 900;
         margin-bottom: 0;
-        border-bottom: 3px solid var(--gray-900);
-        padding-bottom: 50px;
+        padding-bottom: 0;
+        text-align: center;
     }
 
     .app {
@@ -683,7 +698,8 @@ tr.cat-header.cat-cleaning td {
         box-shadow: none;
         overflow: visible;
         padding: 0;
-        padding-top: 0px;   
+        padding-top: 0px;
+        border-top: 3px solid var(--gray-900);
         border-left: 3px solid var(--gray-900);
         border-right: 3px solid var(--gray-900);
     }
@@ -714,7 +730,7 @@ tr.cat-header.cat-cleaning td {
     .schedule-table thead th {
         font-size: 10pt;
         font-weight: 800;
-        padding: 10px 8px;
+        padding: 6px 8px;
         border-bottom-width: 3px;
     }
 
@@ -724,7 +740,7 @@ tr.cat-header.cat-cleaning td {
 
     /* Body rows - stronger borders */
     .schedule-table tbody td {
-        padding: 10px 8px;
+        padding: 6px 8px;
         font-size: 10pt;
         border-bottom: 1px solid var(--gray-300);
     }
@@ -737,23 +753,40 @@ tr.cat-header.cat-cleaning td {
     td.role-label {
         font-size: 10pt;
         font-weight: 700;
-        padding-left: 16px;
+        padding-left: 14px;
     }
 
     td.role-label i {
         font-size: 12pt;
     }
 
-    /* Category headers - thicker, bolder */
-    .cat-header td {
-        padding: 10px 16px;
+    /* Category headers - keep compact; section spacing comes from .section-gap rows */
+    .schedule-table tbody tr.cat-header td {
+        padding: 8px 14px;
         font-size: 10pt;
         font-weight: 900;
         border-bottom-width: 3px;
     }
 
-    .cat-header td:first-child i {
+    .schedule-table tbody tr.cat-header td:first-child i {
         font-size: 14pt;
+    }
+
+    /* White spacer between sections (print only) */
+    tr.section-gap { display: table-row; }
+    tr.section-gap td {
+        padding: 0 !important;
+        height: 14px;
+        border: none !important;
+        background: white !important;
+    }
+
+    /* Disabled (Sun) cells in print */
+    td.disabled-cell {
+        background: var(--gray-50) !important;
+    }
+    td.disabled-cell select {
+        color: transparent !important;
     }
 
     /* Select values as plain text */

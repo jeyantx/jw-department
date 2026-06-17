@@ -12,15 +12,17 @@ const FIREBASE_CONFIG = {
 
 const COLLECTION = 'sound_schedule';
 
-const BROTHERS = [
+const AUDIO_BROTHERS = [
     '-',
-    'Br. Anand', 'Br. Ben Cyrus', 'Br. Bovaz', 'Br. Daniel', 'Br. Devakumar',
-    'Br. Dominic', 'Br. Hari', 'Br. Inbaraj', 'Br. Jagan', 'Br. Jeyant',
-    'Br. Joseph', 'Br. Jotham', 'Br. Karuppusamy', 'Br. Muthumohan', 'Br. Pandian',
-    'Br. Prabakar', 'Br. Praveen', 'Br. Prem', 'Br. Raja', 'Br. Rejikumar',
-    'Br. Shadrach', 'Br. Sivakumar', 'Br. Sree Nithish', 'Br. Sreekanth',
-    'Br. Srinivasan', 'Br. Stephen', 'Br. Thomas', 'Br. Ulaganathan',
-    'Br. Vinu', 'Br. Vivin'
+    'Br. Anand', 'Br. Hari', 'Br. Jagan', 'Br. Jotham',
+    'Br. Prabakar', 'Br. Prem', 'Br. Vinu'
+];
+
+const ATTENDANT_BROTHERS = [
+    '-',
+    'Br. Bovaz', 'Br. Devakumar', 'Br. Jeyant', 'Br. Joseph',
+    'Br. Pandian', 'Br. Rejikumar', 'Br. Shadrach', 'Br. Sivakumar',
+    'Br. Stephen', 'Br. Thomas', 'Br. Ulaganathan'
 ];
 
 const CLEANING_GROUPS = [
@@ -244,6 +246,7 @@ function renderBody() {
     for (var r = 0; r < ROLES.length; r++) {
         var role = ROLES[r];
         if (role.cat !== lastCat) {
+            html += '<tr class="section-gap"><td colspan="' + (n + 1) + '"></td></tr>';
             lastCat = role.cat;
             var c = CATEGORIES[role.cat];
             html += '<tr class="cat-header ' + c.css + '">';
@@ -251,15 +254,17 @@ function renderBody() {
             html += emptyTds;
             html += '</tr>';
         }
+        var brotherList = role.cat === 'sound' ? AUDIO_BROTHERS : ATTENDANT_BROTHERS;
         html += '<tr>';
         html += '<td class="role-label"><i class="' + role.icon + '"></i>' + role.label + '</td>';
         for (var i = 0; i < n; i++) {
-            html += '<td>' + dropdown(role.key, i, BROTHERS) + '</td>';
+            html += '<td>' + dropdown(role.key, i, brotherList) + '</td>';
         }
         html += '</tr>';
     }
 
     // Cleaning
+    html += '<tr class="section-gap"><td colspan="' + (n + 1) + '"></td></tr>';
     var cl = CATEGORIES.cleaning;
     html += '<tr class="cat-header ' + cl.css + '">';
     html += '<td><i class="' + cl.icon + '"></i> ' + cl.label + '</td>';
@@ -271,7 +276,9 @@ function renderBody() {
         html += '<tr>';
         html += '<td class="role-label"><i class="' + crole.icon + '"></i>' + crole.label + '</td>';
         for (var j = 0; j < n; j++) {
-            html += '<td>' + dropdown(crole.key + '_grp', j, CLEANING_GROUPS) + '</td>';
+            // Mopping & Stage runs on midweek meetings only; Sundays are disabled
+            var disable = crole.key === 'clean_mop' && !isMidweek(meetings[j]);
+            html += '<td' + (disable ? ' class="disabled-cell"' : '') + '>' + dropdown(crole.key + '_grp', j, CLEANING_GROUPS, disable) + '</td>';
         }
         html += '</tr>';
     }
@@ -279,9 +286,9 @@ function renderBody() {
     document.getElementById('tableBody').innerHTML = html;
 }
 
-function dropdown(roleKey, colIndex, options) {
+function dropdown(roleKey, colIndex, options, disabled) {
     var id = 'sel_' + roleKey + '_' + colIndex;
-    var html = '<select id="' + id + '" data-role="' + roleKey + '" data-col="' + colIndex + '">';
+    var html = '<select id="' + id + '" data-role="' + roleKey + '" data-col="' + colIndex + '"' + (disabled ? ' disabled' : '') + '>';
     for (var i = 0; i < options.length; i++) {
         html += '<option value="' + options[i] + '">' + options[i] + '</option>';
     }
@@ -546,7 +553,7 @@ function buildPrintClone() {
     // Title
     var title = document.createElement('div');
     title.textContent = 'Urapakkam Congregation - Department Assignment';
-    title.style.cssText = 'font-size:16pt;font-weight:900;color:#111827;padding:0 0 12px;border-bottom:3px solid #111827;margin-bottom:0;';
+    title.style.cssText = 'font-size:14pt;font-weight:900;color:#111827;padding:0 0 8px;border-bottom:3px solid #111827;margin-bottom:0;text-align:center;';
     container.appendChild(title);
 
     // Table
@@ -600,6 +607,13 @@ function buildPrintClone() {
 
         // Category header row
         if (role.cat !== lastCat) {
+            // White spacer row above every section header
+            var gapRow = document.createElement('tr');
+            var gapTd = document.createElement('td');
+            gapTd.colSpan = numCols + 1;
+            gapTd.style.cssText = 'padding:0;height:18px;border:none;background:#fff;';
+            gapRow.appendChild(gapTd);
+            tbody.appendChild(gapRow);
             lastCat = role.cat;
             var catInfo = CATEGORIES[role.cat];
             var cc2 = catColors[role.cat];
@@ -607,7 +621,7 @@ function buildPrintClone() {
             var catTd = document.createElement('td');
             catTd.colSpan = numCols + 1;
             catTd.textContent = catInfo.label.toUpperCase();
-            catTd.style.cssText = 'font-size:10pt;font-weight:900;padding:10px 16px;background:' + cc2.bg + ';color:' + cc2.color + ';border-bottom:3px solid ' + cc2.border + ';letter-spacing:0.5px;';
+            catTd.style.cssText = 'font-size:10pt;font-weight:900;padding:8px 16px;background:' + cc2.bg + ';color:' + cc2.color + ';border-bottom:3px solid ' + cc2.border + ';letter-spacing:0.5px;';
             catRow.appendChild(catTd);
             tbody.appendChild(catRow);
         }
@@ -623,8 +637,14 @@ function buildPrintClone() {
             var td = document.createElement('td');
             var selId = 'sel_' + role.key + '_' + ci;
             var val = vals[selId] || '-';
-            td.textContent = (val && val !== '-') ? val : '';
-            td.style.cssText = 'font-size:10pt;font-weight:600;padding:10px 8px;color:#111827;border-bottom:1px solid #d1d5db;white-space:nowrap;';
+            var mopDisabled = role.key === 'clean_mop_grp' && !isMidweek(meetings[ci]);
+            if (mopDisabled) {
+                td.textContent = '';
+                td.style.cssText = 'font-size:10pt;padding:10px 8px;color:#9ca3af;border-bottom:1px solid #d1d5db;background:#f9fafb;white-space:nowrap;';
+            } else {
+                td.textContent = (val && val !== '-') ? val : '';
+                td.style.cssText = 'font-size:10pt;font-weight:600;padding:10px 8px;color:#111827;border-bottom:1px solid #d1d5db;white-space:nowrap;';
+            }
             row.appendChild(td);
         }
         tbody.appendChild(row);
