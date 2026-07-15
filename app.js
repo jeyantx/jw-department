@@ -20,9 +20,9 @@ const AUDIO_BROTHERS = [
 
 const ATTENDANT_BROTHERS = [
     '-',
-    'Br. Bovaz', 'Br. Devakumar', 'Br. Jeyant', 'Br. Joseph',
+    'Br. Anand', 'Br. Bovaz', 'Br. Devakumar', 'Br. Jeyant', 'Br. Joseph',
     'Br. Pandian', 'Br. Rejikumar', 'Br. Shadrach', 'Br. Sivakumar',
-    'Br. Stephen', 'Br. Thomas', 'Br. Ulaganathan'
+    'Br. Thomas', 'Br. Ulaganathan'
 ];
 
 const CLEANING_GROUPS = [
